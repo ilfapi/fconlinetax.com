@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <link rel="icon" type="image/x-icon" href="img/fcpc.ico">
+        <title>Tính thuế - FC Online</title>
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="css/bootstrap.min.css"/>
+        <!-- boxed-check -->
+        <link rel="stylesheet" href="css/boxed-check.min.css" />
+
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f4f4f4;
+                text-align: left;
+                padding: 20px;
+            }
+
+            #calculator {
+                max-width: 500px;
+                margin: 0 auto;
+                background-color: #fff;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+
+            label {
+                display: block;
+                margin-bottom: 8px;
+            }
+
+            input,
+            select {
+                width: 100%;
+                padding: 8px;
+                margin-bottom: 16px;
+                box-sizing: border-box;
+            }
+
+            button {
+                background-color: #4caf50;
+                color: #fff;
+                padding: 10px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+
+            button:hover {
+                background-color: #45a049;
+            }
+
+            #result {
+                margin-top: 20px;
+                font-weight: bold;
+                color: "green;";
+                font-size: 22px;
+            }
+
+            .mr-bt-10 {
+                margin-bottom: 10px;
+            }
+
+            #taxRate {
+                color: red;
+                font-weight: bold;
+                font-size: 18px;
+            }
+
+            .grid-container-coupon {
+                display: grid;
+                grid-template-columns: auto auto auto;
+            }
+
+            #price-svip, #price-vip, #price-pc, #price-cp{
+                color: #16d416;
+                padding-left: 5px;
+            }
+
+            #display-price-svip, #display-price-vip, #display-price-pc, #display-price-cp {
+                display: none;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="calculator">
+            <h3>Tính Thuế Chuyển Nhượng Cầu Thủ</h3>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Giá</span>
+                </div>
+
+                <input type="text" class="form-control" id="income" placeholder="0" required oninput="formatCurrency(this)" onkeyup="calculateTaxAndDiscount()" />
+                <div class="input-group-append">
+                    <span class="input-group-text">BP</span>
+                </div>
+            </div>
+
+            <label for="taxRate">Hoa hồng 40%: <span id="taxRate"></span></label>
+
+
+            <div class="overview-radio mb-3">
+                <label for="discountType">Giảm giá</label>
+                <div class="row boxed-check-group boxed-check-secondary">
+                    <div class="col-4 col-sm-4">
+                        <label class="boxed-check">
+                            <input class="boxed-check-input" type="checkbox" name="radio-overview" id="radio-overview-svip" onclick="calculateTaxAndDiscount()" />
+                            <div class="boxed-check-label">SVIP 20%</div>
+                        </label>
+                    </div>
+                    <div class="col-4 col-sm-4">
+                        <label class="boxed-check">
+                            <input class="boxed-check-input" type="checkbox" name="radio-overview" id="radio-overview-vip" onclick="calculateTaxAndDiscount()" />
+                            <div class="boxed-check-label">VIP 10%</div>
+                        </label>
+                    </div>
+                    <div class="col-4 col-sm-4">
+                        <label class="boxed-check">
+                            <input class="boxed-check-input" type="checkbox" name="radio-overview" id="radio-overview-pc" onclick="calculateTaxAndDiscount()" />
+                            <div class="boxed-check-label">PC 10%</div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="row boxed-check-group boxed-check-secondary">
+                    <div class="col-4 col-sm-4 mr-bt-10">
+                        <label class="boxed-check">
+                            <input class="boxed-check-input" type="checkbox" name="radio-overview" id="radio-overview-cp-30" onclick="calculateTaxAndDiscount()" />
+                            <div class="boxed-check-label">CP 30%</div>
+                        </label>
+                    </div>
+                    <div class="col-4 col-sm-4 mr-bt-10">
+                        <label class="boxed-check">
+                            <input class="boxed-check-input" type="checkbox" name="radio-overview" id="radio-overview-cp-20" onclick="calculateTaxAndDiscount()" />
+                            <div class="boxed-check-label">CP 20%</div>
+                        </label>
+                    </div>
+                    <div class="col-4 col-sm-4 mr-bt-10">
+                        <label class="boxed-check">
+                            <input class="boxed-check-input" type="checkbox" name="radio-overview" id="radio-overview-cp-10" onclick="calculateTaxAndDiscount()" />
+                            <div class="boxed-check-label">CP 10%</div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="grid-container-coupon">
+                <label for="taxRate" id="display-price-svip">SVIP <span id="price-svip"></span></label>
+                <label for="taxRate" id="display-price-vip">VIP <span id="price-vip"></span></label>
+                <label for="taxRate" id="display-price-pc">PC <span id="price-pc"></span></label>
+                <label for="taxRate" id="display-price-cp">COUPON <span id="price-cp"></span></label>
+            </div>
+            <label for="taxRate">Thu nhập: <span id="result"></span></label>
+            
+        </div>
+
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="js/jquery-3.2.1.slim.min.js"></script>
+        <script src="js/popper.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+
+        <script>
+            function isNumberKey(evt) {
+                var charCode = evt.which ? evt.which : evt.keyCode;
+                return !(charCode > 31 && (charCode < 48 || charCode > 57));
+            }
+
+            function formatCurrency2(input) {
+                // Format as currency (Vietnamese)
+                var formattedValue = Number(input).toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                });
+                formattedValue = formattedValue.replace(/₫/g, '');
+                return formattedValue;
+            }
+
+            function formatCurrency(input) {
+                // Remove non-numeric characters
+                var sanitizedValue = input.value.replace(/[^0-9]/g, "");
+
+                // Format as currency (Vietnamese)
+                var formattedValue = Number(sanitizedValue).toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                });
+
+                // Remove the currency symbol
+                formattedValue = formattedValue.replace(/₫/g, '');
+                formattedValue = formattedValue.replace(/\s+/g, '');
+
+                // Update the input value with the formatted currency
+                input.value = formattedValue;
+            }
+
+            function removeSpecialCharacters(inputString) {
+                return parseInt(inputString.replace(/[^a-zA-Z0-9]/g, ''));
+            }
+
+            function calculateTaxAndDiscount() {
+                var income = document.getElementById('income').value;
+                var discountPercentage = 0,
+                    discountPercentageSVIP = 0,
+                    discountPercentageVIP = 0,
+                    discountPercentagePC = 0,
+                    discountPercentageCP30 = 0,
+                    discountPercentageCP20 = 0,
+                    discountPercentageCP10 = 0;
+                var svip = document.getElementById("radio-overview-svip");
+                var vip = document.getElementById("radio-overview-vip");
+                var pc = document.getElementById("radio-overview-pc");
+                var cp30 = document.getElementById("radio-overview-cp-30");
+                var cp20 = document.getElementById("radio-overview-cp-20");
+                var cp10 = document.getElementById("radio-overview-cp-10");
+                var sanitizedIncome = income.replace(/[^0-9]/g, '');
+                var numericIncome = Number(sanitizedIncome);
+                var taxRate = 40; // Default tax rate is 40%
+                var tax = (numericIncome * taxRate) / 100;
+
+                svip.addEventListener("change", function () {
+                    vip.checked = false;
+                    document.getElementById("display-price-vip").style.display = "none";
+                });
+
+                vip.addEventListener("change", function () {
+                    svip.checked = false;
+                    document.getElementById("display-price-svip").style.display = "none";
+                });
+
+                cp30.addEventListener("change", function () {
+                    cp20.checked = false;
+                    cp10.checked = false;
+                    discountPercentageCP30 = (tax * 30) / 100;
+                    document.getElementById("display-price-cp").style.display = "inline-flex";
+                    document.getElementById("price-cp").innerHTML = `+${formatCurrency2(discountPercentageCP30)}`
+                });
+
+                cp20.addEventListener("change", function () {
+                    cp30.checked = false;
+                    cp10.checked = false;
+                    discountPercentageCP20 = (tax * 20) / 100;
+                    document.getElementById("display-price-cp").style.display = "inline-flex";
+                    document.getElementById("price-cp").innerHTML = `+${formatCurrency2(discountPercentageCP20)}`
+                });
+
+                cp10.addEventListener("change", function () {
+                    cp30.checked = false;
+                    cp20.checked = false;
+                    discountPercentageCP10 = (tax * 10) / 100;
+                    document.getElementById("display-price-cp").style.display = "inline-flex";
+                    document.getElementById("price-cp").innerHTML = `+${formatCurrency2(discountPercentageCP10)}`
+                });
+                
+                if (svip.checked) {
+                    discountPercentage = 20
+                    discountPercentageSVIP = (tax * discountPercentage) / 100;
+                    document.getElementById("display-price-svip").style.display = "inline-flex";
+                    document.getElementById("price-svip").innerHTML = `+${formatCurrency2(discountPercentageSVIP)}`
+                }else{
+                    discountPercentage = 0
+                    document.getElementById("display-price-svip").style.display = "none";
+                    document.getElementById("price-svip").innerHTML = ""
+                }
+
+                if (vip.checked) {
+                    discountPercentage = discountPercentage + 10
+                    discountPercentageVIP = (tax * 10) / 100;
+                    document.getElementById("display-price-vip").style.display = "inline-flex";
+                    setTimeout(() => {
+                        document.getElementById("price-vip").innerHTML = `+${formatCurrency2(discountPercentageVIP)}`
+                    }, 0);
+                }else{
+                    discountPercentage = discountPercentage
+                    document.getElementById("display-price-vip").style.display = "none";
+                    setTimeout(() => {
+                        document.getElementById("price-vip").innerHTML = ""
+                    }, 0);
+                }
+
+                if (pc.checked) {
+                    discountPercentage = discountPercentage + 10
+                    discountPercentagePC = (tax * 10) / 100;
+                    document.getElementById("display-price-pc").style.display = "inline-flex";
+                    document.getElementById("price-pc").innerHTML = `+${formatCurrency2(discountPercentagePC)}`
+                }else{
+                    discountPercentage = discountPercentage
+                    document.getElementById("display-price-pc").style.display = "none";
+                    document.getElementById("price-vip").innerHTML = ""
+                }
+
+                if (cp30.checked) {
+                    discountPercentageCP30 = (tax * 30) / 100;
+                    document.getElementById("display-price-cp").style.display = "inline-flex";
+                    document.getElementById("price-cp").innerHTML = `+${formatCurrency2(discountPercentageCP30)}`
+                    discountPercentageCP20 = 0
+                    discountPercentageCP10 = 0
+                }
+
+                if (cp20.checked) {
+                    discountPercentageCP20 = (tax * 20) / 100;
+                    document.getElementById("display-price-cp").style.display = "inline-flex";
+                    document.getElementById("price-cp").innerHTML = `+${formatCurrency2(discountPercentageCP20)}`
+                    discountPercentageCP30 = 0
+                    discountPercentageCP10 = 0
+                }
+
+                if (cp10.checked) {
+                    discountPercentageCP10 = (tax * 10) / 100;
+                    document.getElementById("display-price-cp").style.display = "inline-flex";
+                    document.getElementById("price-cp").innerHTML = `+${formatCurrency2(discountPercentageCP10)}`
+                    discountPercentageCP20 = 0
+                    discountPercentageCP30 = 0
+                }
+
+                if (!cp30.checked && !cp20.checked && !cp10.checked) {
+                    setTimeout(() => {
+                        document.getElementById("display-price-cp").style.display = "none";
+                        document.getElementById("price-cp").innerHTML = ""
+                    }, 0);
+                    discountPercentageCP10 = 0;
+                    discountPercentageCP20 = 0
+                    discountPercentageCP30 = 0
+                }
+
+                var discount = (discountPercentageSVIP + discountPercentageVIP + discountPercentagePC + discountPercentageCP30 + discountPercentageCP20 + discountPercentageCP10)
+                var result = (numericIncome - tax) + discount;
+
+                document.getElementById("taxRate").innerHTML = (numericIncome > 1) ? `- ${formatCurrency2(tax.toFixed(0))}` : "";
+                document.getElementById("result").innerHTML = formatCurrency2(result.toFixed(0));
+            }
+        </script>
+    </body>
+</html>
